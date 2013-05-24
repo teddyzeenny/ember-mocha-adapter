@@ -13,7 +13,7 @@ are sync or async.
 
 ### Setup
 
-Include the mocha_adapter.js file in your test.  Then:
+Include the `adapter.js` file in your test.  Then:
 
 ```javascript
 Ember.Test.adapter = Ember.MochaAdapter.create();
