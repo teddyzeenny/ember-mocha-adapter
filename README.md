@@ -10,7 +10,16 @@ It gets rid of the `done()` callback and lets
 you test without worrying whether your tests
 are sync or async.
 
-Example:
+
+### Setup
+
+Include the mocha_adapter.js file in your test.  Then:
+
+```javascript
+Ember.Test.adapter = Ember.MochaAdapter.create();
+```
+
+### Example:
 
 ```javascript
 
@@ -20,6 +29,9 @@ describe("Adding a post", function() {
     visit('posts/new');
   });
 
+  afterEach(function() {
+    App.reset();
+  });
 
   it("should take me to a form", function() {
     find('form').should.exist;
@@ -40,9 +52,6 @@ describe("Adding a post", function() {
     });
   });
 
-  afterEach(function() {
-    App.reset();
-  });
 
 });
 

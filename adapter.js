@@ -3,19 +3,24 @@
 
   done = null;
   doneTimeout = null;
-  countAsync = 0;
+  isAsync = false;
 
   Ember.Test.MochaAdapter = Ember.Test.Adapter.extend({
+    init: function() {
+      this._super();
+      window.mocha.ui('ember-bdd');
+    },
     asyncStart: function() {
-      countAsync++;
+      isAsync = true;
       clearTimeout(doneTimeout);
     },
     asyncEnd: function() {
-      countAsync--;
-      if (done && countAsync === 0) {
+      isAsync = false;
+      if (done) {
         doneTimeout = setTimeout(function() {
-          done();
-          done = null;
+          if (!isAsync) {
+            done();
+          }
         });
       }
     },
@@ -34,57 +39,124 @@
   });
 
 
-  // Overwrite the default Mocha
-  // methods to get rid of manually taking
-  // care of the `done()` callback
-
-  var oldBefore, oldBeforeEach,
-      oldAfter, oldAfterEach, oldIt;
-
-  oldBefore = window.before;
-  window.before = fixAsync(oldBefore);
-
-  oldBeforeEach = window.beforeEach;
-  window.beforeEach = fixAsync(oldBeforeEach);
-
-  oldAfter = window.after;
-  window.after = fixAsync(oldAfter);
-
-  oldAfterEach = window.afterEach;
-  window.afterEach = fixAsync(oldAfterEach);
-
-
-
-  function fixAsync(method) {
+  function fixAsync(suites, methodName) {
     return function(fn) {
       if (fn.length === 1) {
-      return method(fn);
+        suites[0][methodName](fn);
+      } else {
+        suites[0][methodName](function(d) {
+          invoke(fn, d);
+        });
       }
-      return method(function(d) {
-        done = d;
-        fn();
-        if (countAsync === 0) {
-          d();
-          done = null;
-        }
-      });
     };
   }
 
-  oldIt = window.it;
-
-  window.it = function(desc, fn) {
-    if (fn.length === 1) {
-      return oldIt(desc, fn);
+  function invoke(fn, d) {
+    done = d;
+    fn();
+    if (!isAsync) {
+      d();
+      done = null;
     }
-    return oldIt(desc, function(d) {
-      done = d;
-      fn();
-      if (countAsync === 0) {
-        d();
-        done = null;
-      }
+  }
+
+  var emberBdd = function(suite) {
+    var suites = [suite];
+
+    suite.on('pre-require', function(context, file, mocha) {
+
+      context.before = fixAsync(suites, 'beforeAll');
+
+      context.after = fixAsync(suites, 'afterAll');
+
+      context.beforeEach = fixAsync(suites, 'beforeEach');
+
+      context.afterEach = fixAsync(suites, 'afterEach');
+
+      /**
+       * Describe a specification or test-case
+       * with the given `title` and callback `fn`
+       * acting as a thunk.
+       */
+
+      context.it = context.specify = function(title, fn){
+        var suite = suites[0], test;
+        if (suite.pending) {
+          fn = null;
+        }
+        if (!fn || fn.length === 1) {
+          test = new Mocha.Test(title, fn);
+        } else {
+          var method = function(d) {
+            invoke(fn, d);
+          };
+          test = new Mocha.Test(title, method);
+        }
+        suite.addTest(test);
+        return test;
+      };
+
+      /**
+       * Describe a "suite" with the given `title`
+       * and callback `fn` containing nested suites
+       * and/or tests.
+       */
+
+      context.describe = context.context = function(title, fn){
+        var suite = Mocha.Suite.create(suites[0], title);
+        suites.unshift(suite);
+        fn.call(suite);
+        suites.shift();
+        return suite;
+      };
+
+      /**
+       * Pending describe.
+       */
+
+      context.xdescribe =
+      context.xcontext =
+      context.describe.skip = function(title, fn){
+        var suite = Mocha.Suite.create(suites[0], title);
+        suite.pending = true;
+        suites.unshift(suite);
+        fn.call(suite);
+        suites.shift();
+      };
+
+      /**
+       * Exclusive suite.
+       */
+
+      context.describe.only = function(title, fn){
+        var suite = context.describe(title, fn);
+        mocha.grep(suite.fullTitle());
+      };
+
+
+      /**
+       * Exclusive test-case.
+       */
+
+      context.it.only = function(title, fn){
+        var test = context.it(title, fn);
+        mocha.grep(test.fullTitle());
+      };
+
+      /**
+       * Pending test case.
+       */
+
+      context.xit =
+      context.xspecify =
+      context.it.skip = function(title){
+        context.it(title);
+      };
+
+
     });
+
   };
 
+  window.Mocha.interfaces['ember-bdd'] = emberBdd;
 }());
