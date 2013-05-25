@@ -18,9 +18,7 @@
       isAsync = false;
       if (done) {
         doneTimeout = setTimeout(function() {
-          if (!isAsync) {
-            done();
-          }
+          done();
         });
       }
     },
@@ -60,6 +58,18 @@
     }
   }
 
+
+  /**
+    ember-bdd mocha interface.
+    This interface allows
+    the Ember.js tester
+    to forget about sync / async
+    and treat all tests the same.
+
+    This interface, along with the adapter
+    will take care of handling sync vs async
+  */
+
   var emberBdd = function(suite) {
     var suites = [suite];
 
@@ -73,11 +83,6 @@
 
       context.afterEach = fixAsync(suites, 'afterEach');
 
-      /**
-       * Describe a specification or test-case
-       * with the given `title` and callback `fn`
-       * acting as a thunk.
-       */
 
       context.it = context.specify = function(title, fn){
         var suite = suites[0], test;
@@ -96,12 +101,6 @@
         return test;
       };
 
-      /**
-       * Describe a "suite" with the given `title`
-       * and callback `fn` containing nested suites
-       * and/or tests.
-       */
-
       context.describe = context.context = function(title, fn){
         var suite = Mocha.Suite.create(suites[0], title);
         suites.unshift(suite);
@@ -109,10 +108,6 @@
         suites.shift();
         return suite;
       };
-
-      /**
-       * Pending describe.
-       */
 
       context.xdescribe =
       context.xcontext =
@@ -124,28 +119,17 @@
         suites.shift();
       };
 
-      /**
-       * Exclusive suite.
-       */
-
       context.describe.only = function(title, fn){
         var suite = context.describe(title, fn);
         mocha.grep(suite.fullTitle());
       };
 
 
-      /**
-       * Exclusive test-case.
-       */
-
       context.it.only = function(title, fn){
         var test = context.it(title, fn);
         mocha.grep(test.fullTitle());
       };
 
-      /**
-       * Pending test case.
-       */
 
       context.xit =
       context.xspecify =

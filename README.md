@@ -37,18 +37,18 @@ describe("Adding a post", function() {
     find('form').should.exist;
   });
 
-  it("should not submit with an empty name", function() {
+  it("should not submit with an empty title", function() {
     click('.submit').then(function() {
-      App.get('currentPath').should.equal('posts.new')
+      find('.error').text().should.equal('Title is required.');
     });
   });
 
   it("should create a post on submit", function() {
-    fillIn('.name', 'Test Post').then(function() {
+    fillIn('.title', 'Test Post').then(function() {
       return click('.submit');
     }).then(function() {
-      find('.post').should.exist
-      find('.post-name').text().should.equal('Test Post');
+      find('.post').should.exist;
+      find('.post-title').text().should.equal('Test Post');
     });
   });
 
