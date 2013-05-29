@@ -18,18 +18,20 @@
       isAsync = false;
       if (done) {
         doneTimeout = setTimeout(function() {
-          if(done) {
-            done();
-          }
+          var d = done;
+          done = null;
+          d();
         });
       }
     },
     exception: function(reason) {
-      var error;
+      var error, d;
 
       error = new Error(reason);
       if (done) {
-        done(error);
+        d = done;
+        done = null;
+        d(error);
       } else {
         setTimeout(function() {
           throw error;
