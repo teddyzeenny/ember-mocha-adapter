@@ -18,7 +18,9 @@
       isAsync = false;
       if (done) {
         doneTimeout = setTimeout(function() {
-          done();
+          if(done) {
+            done();
+          }
         });
       }
     },
@@ -53,8 +55,8 @@
     done = d;
     fn();
     if (!isAsync) {
-      d();
       done = null;
+      d();
     }
   }
 
@@ -95,6 +97,9 @@
           var method = function(d) {
             invoke(fn, d);
           };
+          method.toString = function() {
+            return fn.toString();
+          }
           test = new Mocha.Test(title, method);
         }
         suite.addTest(test);
