@@ -44,9 +44,10 @@ describe("Adding a post", function() {
   });
 
   it("should create a post on submit", function() {
-    fillIn('.title', 'Test Post').then(function() {
-      return click('.submit');
-    }).then(function() {
+    fillIn('.title', 'Test Post')
+    .fillIn('.body', 'This is the body')
+    .click('.submit')
+    .then(function() {
       find('.post').should.exist;
       find('.post-title').text().should.equal('Test Post');
     });
