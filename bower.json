@@ -11,8 +11,5 @@
     "mocha"
   ],
   "ignore": [],
-  "dependencies": {
-    "mocha": "~1.10.0",
-    "ember": "~1.0.0-rc4"
-  }
+  "dependencies": {}
 }
