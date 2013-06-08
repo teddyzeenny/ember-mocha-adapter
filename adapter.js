@@ -1,5 +1,5 @@
 (function() {
-  var done, doneTimeout, countAsync;
+  var done, doneTimeout, countAsync, emberBdd;
 
   done = null;
   doneTimeout = null;
@@ -8,6 +8,7 @@
   Ember.Test.MochaAdapter = Ember.Test.Adapter.extend({
     init: function() {
       this._super();
+      window.Mocha.interfaces['ember-bdd'] = emberBdd;
       window.mocha.ui('ember-bdd');
     },
     asyncStart: function() {
@@ -74,7 +75,7 @@
     will take care of handling sync vs async
   */
 
-  var emberBdd = function(suite) {
+  emberBdd = function(suite) {
     var suites = [suite];
 
     suite.on('pre-require', function(context, file, mocha) {
@@ -149,5 +150,5 @@
 
   };
 
-  window.Mocha.interfaces['ember-bdd'] = emberBdd;
+
 }());
