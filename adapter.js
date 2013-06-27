@@ -48,15 +48,15 @@
         suites[0][methodName](fn);
       } else {
         suites[0][methodName](function(d) {
-          invoke(fn, d);
+          invoke(this, fn, d);
         });
       }
     };
   }
 
-  function invoke(fn, d) {
+  function invoke(context, fn, d) {
     done = d;
-    fn();
+    fn.call(context);
     if (!isAsync) {
       done = null;
       d();
@@ -98,7 +98,7 @@
           test = new Mocha.Test(title, fn);
         } else {
           var method = function(d) {
-            invoke(fn, d);
+            invoke(this, fn, d);
           };
           method.toString = function() {
             return fn.toString();
