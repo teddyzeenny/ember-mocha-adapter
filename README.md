@@ -13,11 +13,7 @@ are sync or async.
 
 ### Setup
 
-Include the `adapter.js` file in your test.  Then:
-
-```javascript
-Ember.Test.adapter = Ember.Test.MochaAdapter.create();
-```
+Just include the adapter.js file in your test. The Mocha Adapter will automatically be set as the default Test Adapter.
 
 ### Example:
 

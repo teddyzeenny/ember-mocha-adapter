@@ -152,3 +152,5 @@
 
 
 }());
+
+Ember.Test.adapter = Ember.Test.MochaAdapter.create();
