@@ -16,12 +16,13 @@
       clearTimeout(doneTimeout);
     },
     asyncEnd: function() {
+      var scopedDone;
       isAsync = false;
       if (done) {
+        scopedDone = done;
         doneTimeout = setTimeout(function() {
-          var d = done;
           done = null;
-          d();
+          scopedDone();
         });
       }
     },
