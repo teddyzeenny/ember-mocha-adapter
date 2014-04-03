@@ -15,6 +15,8 @@ are sync or async.
 
 Just include the adapter.js file in your test. The Mocha Adapter will automatically be set as the default Test Adapter.
 
+This adapter calls `mocha.setup()` for you. If you call `mocha.setup()` in your test setup code you will break this adapter.
+
 ### Example:
 
 ```javascript
