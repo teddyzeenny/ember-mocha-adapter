@@ -17,6 +17,19 @@ Just include the adapter.js file in your test. The Mocha Adapter will automatica
 
 This adapter calls `mocha.setup()` for you. If you call `mocha.setup()` in your test setup code you will break this adapter.
 
+You should setup Ember.js for testing as described in
+[the documentation](http://emberjs.com/guides/testing/integration/#toc_setup).
+These function calls should happen outside any Mocha callback.
+
+To run the tests, call `mocha.run()` like this:
+
+```javascript
+
+Ember.$(function() {
+  mocha.run();
+});
+```
+
 ### Example:
 
 ```javascript
