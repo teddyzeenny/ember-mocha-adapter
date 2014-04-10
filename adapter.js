@@ -1,3 +1,5 @@
+/* Ember Mocha Adapter | (C) 2014 Teddy Zeenny | https://github.com/teddyzeenny/ember-mocha-adapter */
+
 (function() {
   var done, doneTimeout, countAsync, emberBdd;
 
