@@ -49,16 +49,18 @@ describe("Adding a post", function() {
   });
 
   it("should not submit with an empty title", function() {
-    click('.submit').then(function() {
+    click('.submit');
+
+    andThen(function() {
       find('.error').text().should.equal('Title is required.');
     });
   });
 
   it("should create a post on submit", function() {
-    fillIn('.title', 'Test Post')
-    .fillIn('.body', 'This is the body')
-    .click('.submit')
-    .then(function() {
+    fillIn('.title', 'Test Post');
+    fillIn('.body', 'This is the body');
+    click('.submit');
+    andThen(function() {
       find('.post').should.exist;
       find('.post-title').text().should.equal('Test Post');
     });
