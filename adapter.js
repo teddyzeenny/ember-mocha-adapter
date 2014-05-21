@@ -59,11 +59,15 @@
 
   function invoke(context, fn, d) {
     done = d;
-    fn.call(context);
-    if (!isAsync) {
-      done = null;
-      d();
-    }
+    var result = fn.call(context);
+    if (result && typeof result.then === 'function') {
+      result.then(function() { d() }, d);
+    } else {
+       if (!isAsync) {
+         done = null;
+         d();
+       }
+   }
   }
 
 
