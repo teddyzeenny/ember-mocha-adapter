@@ -1,7 +1,7 @@
 /* Ember Mocha Adapter | (C) 2014 Teddy Zeenny | https://github.com/teddyzeenny/ember-mocha-adapter */
 
 (function() {
-  var done, doneTimeout, countAsync, emberBdd;
+  var done, doneTimeout, countAsync, emberBdd, isPromise;
 
   done = null;
   doneTimeout = null;
@@ -19,11 +19,9 @@
     },
     asyncEnd: function() {
       isAsync = false;
-      if (done) {
+      if (done && !isPromise) {
         doneTimeout = setTimeout(function() {
-          var d = done;
-          done = null;
-          d();
+          complete();
         });
       }
     },
@@ -32,10 +30,7 @@
 
       error = new Error(reason);
       if (done) {
-        d = done;
-        done = null;
-        clearTimeout(doneTimeout)
-        d(error);
+        complete(error);
       } else {
         setTimeout(function() {
           throw error;
@@ -43,7 +38,6 @@
       }
     }
   });
-
 
   function fixAsync(suites, methodName) {
     return function(fn) {
@@ -59,13 +53,37 @@
 
   function invoke(context, fn, d) {
     done = d;
-    fn.call(context);
-    if (!isAsync) {
-      done = null;
-      d();
+    isPromise = false;
+    var result = fn.call(context);
+    // If a promise is returned,
+    // complete test when promise fulfills / rejects
+    if (result && typeof result.then === 'function') {
+      isPromise = true;
+      result.then(function() { complete(); }, complete);
+    } else {
+       if (!isAsync) { complete(); }
     }
   }
 
+  // Called whenever an async test passes or fails.
+  // if `e` is passed, that means the test
+  // failed with exception `e`
+  function complete(e) {
+    clearTimeout(doneTimeout);
+    if (!done) { return; }
+    var d = done;
+    done = null;
+    if (e) {
+      // test failure
+      if (!(e instanceof Error)) {
+        e = new Error(e);
+      }
+      d(e);
+    } else {
+      // test passed
+      d();
+    }
+  }
 
   /**
     ember-bdd mocha interface.
