@@ -1,7 +1,7 @@
 /* Ember Mocha Adapter | (C) 2014 Teddy Zeenny | https://github.com/teddyzeenny/ember-mocha-adapter */
 
 (function() {
-  var done, doneTimeout, countAsync, emberBdd, isPromise;
+  var done, doneTimeout, isAsync, emberBdd, isPromise;
 
   done = null;
   doneTimeout = null;
