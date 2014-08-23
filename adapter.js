@@ -11,7 +11,7 @@
   }
 } (typeof window !== 'undefined' ? window : this, function (Ember) {
 
-  var done, doneTimeout, isAsync, emberBdd, isPromise, MochaAdapter;
+  var done, doneTimeout, isAsync, emberBdd, isPromise, MochaAdapter, ret;
 
   done = null;
   doneTimeout = null;
@@ -179,12 +179,13 @@
 
   };
 
-   // when use directly in the browser, export MochaAdapter as a global
-   var ret = typeof window !== 'undefined'
-    ? window.MochaAdapter = MochaAdapter
-    : MochaAdapter;
+  // when use directly in the browser, export MochaAdapter as a global
+  if (typeof window !== 'undefined') {
+    ret = window.MochaAdapter = Ember.Test.MochaAdapter = MochaAdapter;
+    Ember.Test.adapter = MochaAdapter.create();
+  } else {
+    ret = Ember.Test.MochaAdapter = MochaAdapter;
+  }
 
-   return ret;
+  return ret;
 }));
-
-//Ember.Test.adapter = Ember.Test.MochaAdapter.create();
