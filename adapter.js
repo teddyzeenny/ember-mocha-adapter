@@ -40,13 +40,26 @@
   });
 
   function fixAsync(suites, methodName) {
-    return function(fn) {
-      if (fn.length === 1) {
-        suites[0][methodName](fn);
-      } else {
-        suites[0][methodName](function(d) {
+    return function(name, fn) {
+      if (!fn) {
+        fn = name;
+        name = fn.name;
+      }
+
+      var suite = suites[0];
+      var hook = suite[methodName];
+      var asyncFn = fn;
+
+      if (fn.length === 0) {
+        asyncFn = function(d) {
           invoke(this, fn, d);
-        });
+        };
+      }
+
+      if (hook.length === 2) {
+        hook.call(suite, name, asyncFn);
+      } else {
+        hook.call(suite, asyncFn);
       }
     };
   }
