@@ -5,7 +5,7 @@
 
   done = null;
   doneTimeout = null;
-  isAsync = false;
+  isAsync = 0;
 
   Ember.Test.MochaAdapter = Ember.Test.Adapter.extend({
     init: function() {
@@ -14,12 +14,11 @@
       window.mocha.ui('ember-bdd');
     },
     asyncStart: function() {
-      isAsync = true;
+      isAsync++;
       clearTimeout(doneTimeout);
     },
     asyncEnd: function() {
-      isAsync = false;
-      if (done && !isPromise) {
+      if (--isAsync === 0 && done && !isPromise) {
         doneTimeout = setTimeout(function() {
           complete();
         });
@@ -74,7 +73,7 @@
       isPromise = true;
       result.then(function() { complete(); }, complete);
     } else {
-       if (!isAsync) { complete(); }
+       if (isAsync === 0) { complete(); }
     }
   }
 
