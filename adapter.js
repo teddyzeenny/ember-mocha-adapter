@@ -1,17 +1,27 @@
 /* Ember Mocha Adapter | (C) 2014 Teddy Zeenny | https://github.com/teddyzeenny/ember-mocha-adapter */
 
-(function() {
-  var done, doneTimeout, isAsync, emberBdd, isPromise;
+(function (root, factory) {
+  if (typeof exports === 'object') {
+    module.exports = factory( require('mocha-adapter') );
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define('mocha-adapter', ['ember'], factory);
+  } else {
+    factory( window.MochaAdapter );
+  }
+} (typeof window !== 'undefined' ? window : this, function (Ember) {
+
+  var done, doneTimeout, isAsync, emberBdd, isPromise, MochaAdapter, ret;
 
   done = null;
   doneTimeout = null;
   isAsync = 0;
 
-  Ember.Test.MochaAdapter = Ember.Test.Adapter.extend({
+  MochaAdapter = Ember.Test.Adapter.extend({
     init: function() {
       this._super();
-      window.Mocha.interfaces['ember-bdd'] = emberBdd;
-      window.mocha.ui('ember-bdd');
+      Mocha.interfaces['ember-bdd'] = emberBdd;
+      mocha.ui('ember-bdd');
     },
     asyncStart: function() {
       isAsync++;
@@ -25,7 +35,7 @@
       }
     },
     exception: function(reason) {
-      var error, d;
+      var error;
 
       error = new Error(reason);
       if (done) {
@@ -135,7 +145,7 @@
           };
           method.toString = function() {
             return fn.toString();
-          }
+          };
           test = new Mocha.Test(title, method);
         }
         suite.addTest(test);
@@ -177,13 +187,17 @@
       context.it.skip = function(title){
         context.it(title);
       };
-
-
     });
 
   };
 
+  // when use directly in the browser, export MochaAdapter as a global
+  if (typeof window !== 'undefined') {
+    ret = window.MochaAdapter = Ember.Test.MochaAdapter = MochaAdapter;
+    Ember.Test.adapter = MochaAdapter.create();
+  } else {
+    ret = Ember.Test.MochaAdapter = MochaAdapter;
+  }
 
-}());
-
-Ember.Test.adapter = Ember.Test.MochaAdapter.create();
+  return ret;
+}));
