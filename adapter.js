@@ -72,6 +72,10 @@
     if (result && typeof result.then === 'function') {
       isPromise = true;
       result.then(function() { complete(); }, complete);
+    } else if (Ember.Test.lastPromise) {
+      // Respect the implicit promise chaining in Ember integration tests
+      isPromise = true;
+      Ember.Test.lastPromise.then(function() { complete(); }, complete);
     } else {
        if (isAsync === 0) { complete(); }
     }
