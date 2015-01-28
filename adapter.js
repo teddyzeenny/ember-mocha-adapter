@@ -25,14 +25,14 @@
       }
     },
     exception: function(reason) {
-      var error, d;
-
-      error = new Error(reason);
+      if (!(reason instanceof Error)) {
+        reason = new Error(reason);
+      }
       if (done) {
-        complete(error);
+        complete(reason);
       } else {
         setTimeout(function() {
-          throw error;
+          throw reason;
         });
       }
     }
