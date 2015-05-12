@@ -66,7 +66,7 @@
   function invoke(context, fn, d) {
     done = d;
     isPromise = false;
-    var result = fn.call(context);
+    var result = Ember.run(context, fn);
     // If a promise is returned,
     // complete test when promise fulfills / rejects
     if (result && typeof result.then === 'function') {
