@@ -1,6 +1,8 @@
 Ember Mocha Adapter
 -------------------
 
+**DEPRECATED**: The `ember-mocha-adapter` is now part of the [`ember-mocha`](https://github.com/emberjs/ember-mocha) project!
+
 A mocha adapter for ember-testing.
 
 This adapter makes async testing ember apps with mocha
